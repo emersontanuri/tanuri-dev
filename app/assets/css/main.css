@@ -1,13 +1,28 @@
 @import 'tailwindcss';
 
 /*
- * Theme is driven by a class on <html> so the visitor's choice can be persisted
- * and applied before first paint. Dark is the designed default.
+ * Dark is the designed default, and it is what the document ships, so a visitor
+ * without JavaScript gets the theme the site was designed in. Light is the
+ * opt-out, applied as a class on <html> by the pre-paint script in nuxt.config.
+ *
+ * No theme class is declared in Nuxt's `htmlAttrs`. The head manager re-applies
+ * those attributes during hydration, which would quietly overwrite a choice
+ * made before the first paint. See docs/adr/0005.
  */
-@custom-variant dark (&:where(.dark, .dark *));
-
 :root {
-  /* Light */
+  color-scheme: dark;
+  --canvas: #0b0d10;
+  --surface: #121418;
+  --line: #23262d;
+  --ink: #e8eaed;
+  --ink-muted: #9ba1ab;
+  --accent: #2dd4bf;
+  --signal: #f59e0b;
+}
+
+/* Compounded, so the opt-out wins on specificity rather than on file order. */
+:root.light {
+  color-scheme: light;
   --canvas: #fcfcfd;
   --surface: #ffffff;
   --line: #e4e7ec;
@@ -17,15 +32,11 @@
   --signal: #b45309;
 }
 
-.dark {
-  --canvas: #0b0d10;
-  --surface: #121418;
-  --line: #23262d;
-  --ink: #e8eaed;
-  --ink-muted: #9ba1ab;
-  --accent: #2dd4bf;
-  --signal: #f59e0b;
-}
+/*
+ * `dark` means "light was not chosen". It is phrased against the opt-out rather
+ * than against the default, because the default ships with no class at all.
+ */
+@custom-variant dark (&:where(html:not(.light), html:not(.light) *));
 
 @theme inline {
   --color-canvas: var(--canvas);
