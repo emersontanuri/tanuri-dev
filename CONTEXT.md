@@ -48,6 +48,10 @@ _Avoid_: carreira, timeline, histórico profissional.
 Um diagrama de setas, autorado como conteúdo, que representa uma cadeia de etapas.
 _Avoid_: diagrama, gráfico, fluxograma.
 
+**Etapa**:
+Uma unidade de um Fluxo, apresentada na ordem em que a cadeia a percorre.
+_Avoid_: passo (_reservado à Cadeia de pensamento_), nó, bloco, caixa.
+
 **Pesquisa**:
 Trabalho investigativo apresentado separadamente do trabalho comercial.
 _Avoid_: projeto de pesquisa, paper, artigo.

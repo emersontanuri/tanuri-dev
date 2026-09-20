@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { fluxo } from './fluxos'
 
 /**
  * The content model for Projetos, kept in a plain module rather than inline in
@@ -49,12 +50,12 @@ export type TipoDeProjeto = (typeof tiposDeProjeto)[number]
 /**
  * A Projeto.
  *
- * `stack`, `metodos` and `periodo` are nullish rather than optional because
- * that is how an unpublished field arrives: the source material has no stack
- * for two projects, no methods for one, and no period for any, and
- * `@nuxt/content` stores a field that is not in the frontmatter as NULL. A list
- * or a date the owner never supplied is omitted rather than invented, so the
- * schema accepts its absence and nothing else.
+ * `stack`, `metodos`, `fluxos` and `periodo` are nullish rather than optional
+ * because that is how an unpublished field arrives: the source material has no
+ * stack for two projects, no methods for one, no flow for four of the five, and
+ * no period for any, and `@nuxt/content` stores a field that is not in the
+ * frontmatter as NULL. A list or a date the owner never supplied is omitted
+ * rather than invented, so the schema accepts its absence and nothing else.
  *
  * `ordem` is read as a number because the content database stores it as text,
  * so "1" is what usually arrives however it was authored. The ordering is
@@ -71,6 +72,7 @@ export const projeto = z.object({
   ordem: z.coerce.number().int().min(1),
   stack: z.array(z.string()).nullish(),
   metodos: z.array(z.string()).nullish(),
+  fluxos: z.array(fluxo).nullish(),
   periodo: z.string().min(1).nullish(),
 })
 

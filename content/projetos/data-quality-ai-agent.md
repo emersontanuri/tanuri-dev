@@ -9,22 +9,14 @@ metodos:
   - LLMs
   - Validação humana
   - Geração automática de relatórios
+fluxos:
+  - titulo: Fluxo dos agentes
+    etapas:
+      - Data Sources
+      - Data Source Analyst
+      - QA Structure Agent
+      - Human Validation
+      - Senior Data Analyst
+      - Execution
+      - Report
 ---
-
-Fluxo dos agentes:
-
-```text
-Data Sources
-     ↓
-Data Source Analyst
-     ↓
-QA Structure Agent
-     ↓
-Human Validation
-     ↓
-Senior Data Analyst
-     ↓
-Execution
-     ↓
-Report
-```

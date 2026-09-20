@@ -47,6 +47,16 @@ const projeto = data.value
         <ContentRenderer :value="projeto" />
       </div>
 
+      <section v-if="projeto.fluxos?.length" class="mt-12">
+        <h2
+          class="font-mono text-2xs uppercase tracking-[0.2em] text-ink-muted"
+        >
+          Fluxos
+        </h2>
+
+        <Fluxos :fluxos="projeto.fluxos" />
+      </section>
+
       <section v-if="projeto.metodos?.length" class="mt-12">
         <h2
           class="font-mono text-2xs uppercase tracking-[0.2em] text-ink-muted"
