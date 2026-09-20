@@ -9,6 +9,8 @@ import {
 import { resolve } from 'node:path'
 import { afterEach, beforeAll, describe, expect, it } from 'vitest'
 import { projeto, tiposDeProjeto } from '../shared/projetos'
+import type { Fluxo } from '../shared/fluxos'
+import { fluxo } from '../shared/fluxos'
 import { assertProjects } from '../app/utils/assertProjects'
 
 /**
@@ -365,14 +367,32 @@ describe('theme', () => {
 })
 
 /**
+ * The Data Quality AI Agent workflow, as the source material drew it: a chain of
+ * seven steps, in order, and the only flow a project has published so far.
+ */
+const etapasDosAgentes = [
+  'Data Sources',
+  'Data Source Analyst',
+  'QA Structure Agent',
+  'Human Validation',
+  'Senior Data Analyst',
+  'Execution',
+  'Report',
+]
+
+/**
  * The five Projetos, and what each must show.
  *
  * The order is written out rather than derived from the files, because the
  * order is a decision: delivered work first, then the applied study, the
  * experiment, the laboratory, and the environment underneath all of it last.
  *
- * `metodos` and `stack` are the published lists. An empty one means the source
- * never published it, and the page must not invent a section for it.
+ * `problema` is the line on the page that states what the project addresses:
+ * the body prose where the source published it, and a resumo where the source
+ * published nothing else.
+ *
+ * `metodos`, `stack` and `fluxos` are the published lists. An empty one means
+ * the source never published it, and the page must not invent a section for it.
  */
 const projetos = [
   {
@@ -382,6 +402,7 @@ const projetos = [
     problema: 'O projeto explora problemas como',
     metodos: [] as string[],
     stack: ['FastAPI', 'Nuxt', 'Python', 'Docker'],
+    fluxos: [] as Fluxo[],
   },
   {
     slug: 'pipeline-planning-simulation',
@@ -390,14 +411,18 @@ const projetos = [
     problema: 'Problemas estudados incluem',
     metodos: ['Monte Carlo', 'Discrete Event Simulation', 'SimPy'],
     stack: [] as string[],
+    fluxos: [] as Fluxo[],
   },
   {
     slug: 'data-quality-ai-agent',
     titulo: 'Data Quality AI Agent',
     tipo: 'Experimento',
-    problema: 'Fluxo dos agentes',
+    problema: 'analisar e validar a qualidade de dados',
     metodos: ['Regras determinísticas', 'LLMs', 'Validação humana'],
     stack: [] as string[],
+    fluxos: [
+      { titulo: 'Fluxo dos agentes', etapas: etapasDosAgentes },
+    ] as Fluxo[],
   },
   {
     slug: 'optimization-simulation-lab',
@@ -406,6 +431,7 @@ const projetos = [
     problema: 'O laboratório explora como diferentes métodos quantitativos',
     metodos: ['Teoria das Filas', 'Bayesian Modeling', 'Risk Analysis'],
     stack: [] as string[],
+    fluxos: [] as Fluxo[],
   },
   {
     slug: 'homelab-ai-infrastructure',
@@ -414,6 +440,7 @@ const projetos = [
     problema: 'O ambiente funciona como laboratório',
     metodos: [] as string[],
     stack: ['Ubuntu Server', 'Docker', 'Cloudflare Tunnel', 'n8n'],
+    fluxos: [] as Fluxo[],
   },
 ] as const
 
@@ -512,6 +539,85 @@ describe('projetos', () => {
   })
 })
 
+/**
+ * Um Fluxo on a project page: the diagram that replaced the monospace block.
+ *
+ * The chain is asserted in the order the source drew it, because that order is
+ * the meaning of the flow, and the arrows are asserted to be hidden from
+ * assistive technology, because a diagram whose connectors are announced
+ * between every pair of steps is read as noise. Whether the diagram fits a
+ * phone is not observable here: it is checked in a browser, and the layout is
+ * a column at every width so that there is nothing to overflow.
+ */
+describe('fluxos', () => {
+  /** The Fluxos section of a project page, so a step cannot satisfy the
+   * assertions from elsewhere on the page. */
+  function secaoDeFluxos(slug: string): string {
+    const encontrada = secao(projetoPage(slug), 'Fluxos')
+
+    expect(encontrada, `${slug} has a Fluxos section`).toBeDefined()
+
+    return encontrada!
+  }
+
+  it('draws a flow as a diagram with one item per step of the chain', () => {
+    const html = secaoDeFluxos('data-quality-ai-agent')
+
+    expect(html, 'the flow is named where it is drawn').toContain(
+      'Fluxo dos agentes',
+    )
+    expect(
+      html.match(/<li[\s>]/g),
+      'every step of the chain is an item of the list',
+    ).toHaveLength(etapasDosAgentes.length)
+  })
+
+  it('keeps the chain in the order the source drew it', () => {
+    const html = secaoDeFluxos('data-quality-ai-agent')
+
+    const posicoes = etapasDosAgentes.map((etapa) => html.indexOf(etapa))
+
+    expect(posicoes, 'every step is on the page').not.toContain(-1)
+    expect(
+      posicoes,
+      'the reading order is the order of the chain',
+    ).toEqual([...posicoes].sort((a, b) => a - b))
+  })
+
+  it('carries every step as text, so the diagram can be read aloud', () => {
+    const html = secaoDeFluxos('data-quality-ai-agent')
+
+    expect(html, 'the diagram is not an image').not.toMatch(
+      /<img|<svg|role="img"/,
+    )
+
+    for (const etapa of etapasDosAgentes) {
+      expect(html, `${etapa} is a text node`).toMatch(
+        new RegExp(`>\\s*${etapa}\\s*<`),
+      )
+    }
+  })
+
+  it('keeps the arrows out of the reading, because they carry no meaning', () => {
+    const html = secaoDeFluxos('data-quality-ai-agent')
+
+    expect(html.match(/aria-hidden="true"/g)).toHaveLength(
+      etapasDosAgentes.length - 1,
+    )
+  })
+
+  it('leaves the section out of a project the source drew no flow for', () => {
+    for (const { slug, fluxos } of projetos) {
+      if (fluxos.length > 0) continue
+
+      expect(
+        secao(projetoPage(slug), 'Fluxos'),
+        `${slug} has no Fluxos section`,
+      ).toBeUndefined()
+    }
+  })
+})
+
 describe('the projeto schema', () => {
   const valido = {
     title: 'Um Projeto',
@@ -563,6 +669,57 @@ describe('the projeto schema', () => {
       ).toBe(false)
     }
   })
+
+  it('accepts a flow, and refuses one that is not a chain', () => {
+    const umFluxo = { titulo: 'Um fluxo', etapas: ['Uma etapa', 'Outra'] }
+
+    expect(projeto.safeParse({ ...valido, fluxos: [umFluxo] }).success).toBe(
+      true,
+    )
+    // A project the source drew no flow for is still a valid project: an
+    // unpublished field arrives as null rather than undefined.
+    expect(projeto.safeParse({ ...valido, fluxos: null }).success).toBe(true)
+    expect(
+      projeto.safeParse({
+        ...valido,
+        fluxos: [{ titulo: 'Etapa única', etapas: ['Só isto'] }],
+      }).success,
+    ).toBe(false)
+  })
+})
+
+/**
+ * The rules of a Fluxo, exercised without a build.
+ *
+ * They are few and they are the whole difference between a chain and a box, so
+ * they are worth covering exhaustively here rather than paying a build for
+ * each one. What the build has to prove is that the rules are applied to
+ * content, which its own tests do.
+ */
+describe('the fluxo schema', () => {
+  const umFluxo = { titulo: 'Um fluxo', etapas: ['Uma etapa', 'Outra etapa'] }
+
+  it('accepts a titled chain of two steps or more', () => {
+    expect(fluxo.safeParse(umFluxo).success).toBe(true)
+    expect(
+      fluxo.safeParse({ ...umFluxo, etapas: ['Um', 'Dois', 'Três'] }).success,
+    ).toBe(true)
+  })
+
+  it('refuses one step, because a single step is not a chain', () => {
+    expect(fluxo.safeParse({ ...umFluxo, etapas: ['Só isto'] }).success).toBe(
+      false,
+    )
+    expect(fluxo.safeParse({ ...umFluxo, etapas: [] }).success).toBe(false)
+  })
+
+  it('refuses a nameless step and a flow with no title', () => {
+    expect(fluxo.safeParse({ ...umFluxo, etapas: ['Um', ''] }).success).toBe(
+      false,
+    )
+    expect(fluxo.safeParse({ ...umFluxo, titulo: '' }).success).toBe(false)
+    expect(fluxo.safeParse({ etapas: umFluxo.etapas }).success).toBe(false)
+  })
 })
 
 /**
@@ -585,6 +742,7 @@ describe('the content gate', () => {
     ordem: '1',
     stack: ['Nuxt'],
     metodos: null,
+    fluxos: null,
     periodo: null,
   }
 
@@ -616,6 +774,14 @@ describe('the content gate', () => {
         `a project without ${campo} is refused`,
       ).resolves.toContain(campo)
     }
+  })
+
+  it('refuses a flow that is not a chain, and names the field', async () => {
+    await expect(
+      refusal([
+        { ...entregue, fluxos: [{ titulo: 'Etapa única', etapas: ['Só isto'] }] },
+      ]),
+    ).resolves.toContain('fluxos')
   })
 
   it('reports every project that fails, not just the first', async () => {
@@ -679,7 +845,7 @@ describe('the content gate, in the build', () => {
     )
   }, 120_000)
 
-  it('turns a new content file into a working route with no code change', async () => {
+  it('turns a new content file into a working route, flow and all, with no code change', async () => {
     writeFileSync(
       novo,
       [
@@ -688,6 +854,11 @@ describe('the content gate, in the build', () => {
         'resumo: Um arquivo escrito por um teste.',
         'tipo: Estudo',
         'ordem: 99',
+        'fluxos:',
+        '  - titulo: Fluxo de prova',
+        '    etapas:',
+        '      - Primeira etapa',
+        '      - Segunda etapa',
         '---',
         '',
         'Um problema declarado por um teste.',
@@ -706,5 +877,19 @@ describe('the content gate, in the build', () => {
       page('projetos/index.html'),
       'and the index links to it',
     ).toContain('href="/projetos/zz-prova-novo"')
+
+    // The criteria this fixture exists for: a flow authored in a content file
+    // reaches a visitor as a diagram, with no component naming it.
+    const pagina = page('projetos/zz-prova-novo/index.html')
+    const posicoes = ['Primeira etapa', 'Segunda etapa'].map((etapa) =>
+      pagina.indexOf(etapa),
+    )
+
+    expect(posicoes, 'the steps of the new flow are on the page').not.toContain(
+      -1,
+    )
+    expect(posicoes, 'in the order they were authored').toEqual(
+      [...posicoes].sort((a, b) => a - b),
+    )
   }, 120_000)
 })
