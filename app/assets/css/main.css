@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /*
  * Theme is driven by a class on <html> so the visitor's choice can be persisted
@@ -36,8 +36,10 @@
   --color-accent: var(--accent);
   --color-signal: var(--signal);
 
-  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, "Cascadia Code", monospace;
+  --font-sans:
+    'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:
+    'Geist Mono', ui-monospace, SFMono-Regular, 'Cascadia Code', monospace;
 
   --text-2xs: 0.6875rem;
   --text-xs: 0.75rem;
