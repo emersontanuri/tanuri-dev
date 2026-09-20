@@ -1,21 +1,5 @@
 import { defineCollection, defineContentConfig, z } from '@nuxt/content'
-
-/**
- * One step of the Cadeia de pensamento: a question and the discipline that
- * answers it. The chain is the site's central argument, so it is authored
- * content rather than copy hardcoded in a component.
- */
-export const passoDaCadeia = z.object({
-  pergunta: z.string(),
-  disciplina: z.string(),
-  explicacao: z.string(),
-})
-
-export type PassoDaCadeia = {
-  pergunta: string
-  disciplina: string
-  explicacao: string
-}
+import { passoDaCadeia, projeto } from './shared/projetos.ts'
 
 export default defineContentConfig({
   collections: {
@@ -30,6 +14,19 @@ export default defineContentConfig({
         // build, and the home page's own chain is asserted by the tests.
         cadeia: z.array(passoDaCadeia).optional(),
       }),
+    }),
+
+    // `page`, not `data`, so every project takes its route from its file path
+    // and its body renders as authored markdown. A new file at
+    // content/projetos/<slug>.md becomes /projetos/<slug> with no code change.
+    //
+    // The rules live in shared/projetos.ts, which is also what the check in
+    // app/utils/assertProjects.ts and the tests use. See that file before
+    // touching the zod dependency.
+    projetos: defineCollection({
+      type: 'page',
+      source: 'projetos/**/*.md',
+      schema: projeto,
     }),
   },
 })

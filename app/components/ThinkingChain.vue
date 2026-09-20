@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PassoDaCadeia } from '../../content.config'
+import type { PassoDaCadeia } from '../../shared/projetos'
 
 /**
  * A Cadeia de pensamento: the five questions, each paired with the discipline

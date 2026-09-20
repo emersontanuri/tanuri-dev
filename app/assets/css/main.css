@@ -83,3 +83,92 @@
     color: var(--canvas);
   }
 }
+
+/*
+ * Authored markdown, as rendered by ContentRenderer.
+ *
+ * Tailwind's preflight takes the list markers and the heading sizes away, and a
+ * project body is prose taken from the source material, so they have to come
+ * back. Deliberately small: it covers what the content uses today and grows
+ * when the content does.
+ */
+@layer components {
+  .prose {
+    color: var(--ink-muted);
+    line-height: 1.7;
+  }
+
+  .prose > * + * {
+    margin-top: 1.25rem;
+  }
+
+  .prose p {
+    text-wrap: pretty;
+  }
+
+  .prose strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .prose a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .prose h2,
+  .prose h3 {
+    margin-top: 2.5rem;
+    color: var(--ink);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .prose h2 {
+    font-size: var(--text-xl);
+  }
+
+  .prose h3 {
+    font-size: var(--text-lg);
+  }
+
+  .prose ul,
+  .prose ol {
+    padding-left: 1.25rem;
+  }
+
+  .prose ul {
+    list-style: disc;
+  }
+
+  .prose ol {
+    list-style: decimal;
+  }
+
+  .prose li::marker {
+    color: var(--line);
+  }
+
+  .prose li + li {
+    margin-top: 0.375rem;
+  }
+
+  .prose blockquote {
+    border-left: 2px solid var(--line);
+    padding-left: 1.25rem;
+    color: var(--ink);
+  }
+
+  .prose pre {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 0.25rem;
+    padding: 1rem 1.25rem;
+    background-color: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+  }
+}

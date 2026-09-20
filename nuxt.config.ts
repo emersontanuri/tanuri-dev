@@ -48,6 +48,21 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  nitro: {
+    prerender: {
+      // Only the index is named. Nothing links to /projetos yet, so the crawler
+      // would never start there, but once it does the index links to every
+      // project and the crawler follows them: a new content file becomes a
+      // working route with no code change and nothing to keep in step here.
+      routes: ['/projetos'],
+      // A page that cannot be rendered has to stop the build rather than ship.
+      // Project frontmatter is validated while the page renders (see
+      // app/utils/assertProjects.ts), and this is the switch that turns an
+      // invalid project into a failed build instead of a blank page.
+      failOnError: true,
+    },
+  },
+
   // Tailwind 4 is wired in as a Vite plugin, not through @nuxtjs/tailwindcss.
   // See docs/adr for why.
   vite: {
