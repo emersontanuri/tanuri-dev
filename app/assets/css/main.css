@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+/*
+ * Theme is driven by a class on <html> so the visitor's choice can be persisted
+ * and applied before first paint. Dark is the designed default.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* Light */
+  --canvas: #fcfcfd;
+  --surface: #ffffff;
+  --line: #e4e7ec;
+  --ink: #111318;
+  --ink-muted: #5a6270;
+  --accent: #0e7490;
+  --signal: #b45309;
+}
+
+.dark {
+  --canvas: #0b0d10;
+  --surface: #121418;
+  --line: #23262d;
+  --ink: #e8eaed;
+  --ink-muted: #9ba1ab;
+  --accent: #2dd4bf;
+  --signal: #f59e0b;
+}
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-accent: var(--accent);
+  --color-signal: var(--signal);
+
+  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, "Cascadia Code", monospace;
+
+  --text-2xs: 0.6875rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+  --text-3xl: 3rem;
+  --text-4xl: 4rem;
+
+  --spacing-section: 8rem;
+}
+
+@layer base {
+  html {
+    background-color: var(--canvas);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    margin: 0;
+  }
+
+  ::selection {
+    background-color: var(--accent);
+    color: var(--canvas);
+  }
+}
