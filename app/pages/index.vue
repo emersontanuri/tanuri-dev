@@ -18,11 +18,15 @@ const { data: page } = await useAsyncData('home', () =>
         {{ page?.tagline }}
       </h1>
 
-      <ul class="mt-12 flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs text-ink-muted">
+      <ul
+        class="mt-12 flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs text-ink-muted"
+      >
         <li v-for="discipline in page?.disciplines" :key="discipline">
           {{ discipline }}
         </li>
       </ul>
     </section>
+
+    <ThinkingChain v-if="page?.cadeia?.length" :passos="page.cadeia" />
   </main>
 </template>

@@ -14,3 +14,7 @@ dist
 
 # Logs
 *.log
+
+# Throwaway probes: scripts written to ask the build a question and then
+# deleted. Anything worth keeping belongs in tests/, not here.
+scratch-*
